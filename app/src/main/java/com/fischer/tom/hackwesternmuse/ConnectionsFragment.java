@@ -75,8 +75,19 @@ public class ConnectionsFragment extends Fragment implements View.OnClickListene
             System.out.println("tp10: " + Math.sqrt(tp10_variance));
             tp10_dataHolder.clear();
 
-            if (tp9_stdDev > 95.0 || fp1_stdDev > 95.0 || fp2_stdDev > 95.0 || tp10_stdDev > 95.0) {
-                // our testing threshold is 50
+            if (seizure_mode && (tp9_stdDev > 95.0 || fp1_stdDev > 95.0 || fp2_stdDev > 95.0 || tp10_stdDev > 95.0)) {
+                // we're still in the same seizure
+                System.out.println("Still the same seizure..");
+                timer.schedule(new dataAnalysis(), 1000);
+            }
+            else if (seizure_mode) {
+                // if just seizure mode, nothing is still acting like a seizure
+                seizure_mode = false;
+                timer.schedule(new dataAnalysis(), 1000);
+
+            }
+            else if (tp9_stdDev > 95.0 || fp1_stdDev > 95.0 || fp2_stdDev > 95.0 || tp10_stdDev > 95.0) {
+                // our testing threshold is 95
                 caution_mode = true;
                 timer.schedule(new cautionMode(), 5000);
             }
@@ -122,7 +133,7 @@ public class ConnectionsFragment extends Fragment implements View.OnClickListene
                 caution_mode = false;
                 seizure_mode = true;
                 System.out.println("YOURE HAVING A SEIZURE");
-                SmsManager.getDefault().sendTextMessage("2262354598", null, "Lin is having a seizure! Call him now!", null,null);
+                SmsManager.getDefault().sendTextMessage("5197025293", null, "Lin is having a seizure! Call him now!", null,null);
                 // if seizure mode is detected as true, send the text message to list of emergency contacts
                 // finish reading data
             }
